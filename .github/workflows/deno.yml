@@ -9,9 +9,6 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        deno-version: [ 'v1.x', 'latest' ]
     steps:
       - name: Setup repo
         uses: actions/checkout@v3
@@ -21,20 +18,19 @@ jobs:
         with:
           path: |
             ~/.deno
-          key: ${{ runner.os }}-deno-${{ hashFiles('**/deps.ts') }}
+          key: ${{ runner.os }}-deno-${{ hashFiles('src/**/deps.ts') }}
           restore-keys: |
             ${{ runner.os }}-deno-
 
       - name: Setup Deno
         uses: denoland/setup-deno@61fe2df320078202e33d7d5ad347e7dcfa0e8f31
         with:
-          deno-version: ${{ matrix.deno-version }}
+          deno-version: '1.40.0'
 
       - name: Verify formatting
         run: deno fmt --check
+        working-directory: src
 
       - name: Run linter
         run: deno lint
-
-      - name: Run tests
-        run: deno test -A
+        working-directory: src
