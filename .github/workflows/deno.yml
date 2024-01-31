@@ -11,10 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Setup repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Cache Deno modules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ~/.deno
