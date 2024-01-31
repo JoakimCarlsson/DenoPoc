@@ -1,7 +1,8 @@
 ﻿import { Context } from "https://deno.land/x/oak@v13.0.0/mod.ts";
 import "../../extensions/oakExtensions.ts";
 
-const JWKS_URL = "https://dev-.36iiyjowe0hqm1m6.us.auth0.com/.well-known/jwks.json";
+const JWKS_URL =
+  "https://dev-.36iiyjowe0hqm1m6.us.auth0.com/.well-known/jwks.json";
 const ISSUER = "https://dev-.36iiyjowe0hqm1m6.us.auth0.com/";
 const AUDIENCE = "https://localhost:7027";
 
@@ -24,7 +25,10 @@ async function authMiddleware(ctx: Context, next: () => Promise<unknown>) {
 
     await next();
   } catch (error) {
-    ctx.toJsonResponse(401, { message: "Get out of here, please", error: error.message });
+    ctx.toJsonResponse(401, {
+      message: "Get out of here, please",
+      error: error.message,
+    });
   }
 }
 
@@ -47,9 +51,9 @@ async function getPublicKey(): Promise<CryptoKey> {
 }
 
 function decodeJWT(token: string) {
-  const parts = token.split('.').map(part => atob(base64urlToBase64(part)));
+  const parts = token.split(".").map((part) => atob(base64urlToBase64(part)));
   if (parts.length !== 3) {
-    throw new Error('Invalid JWT token');
+    throw new Error("Invalid JWT token");
   }
 
   const header = JSON.parse(parts[0]);
@@ -60,33 +64,40 @@ function decodeJWT(token: string) {
 }
 
 function base64urlToBase64(base64url: string): string {
-  base64url = base64url.replace(/-/g, '+').replace(/_/g, '/');
+  base64url = base64url.replace(/-/g, "+").replace(/_/g, "/");
 
   while (base64url.length % 4) {
-    base64url += '=';
+    base64url += "=";
   }
 
   return base64url;
 }
 
-async function verifyJWT(token: string, publicKey: CryptoKey): Promise<boolean> {
+async function verifyJWT(
+  token: string,
+  publicKey: CryptoKey,
+): Promise<boolean> {
   const { header, payload, signature } = decodeJWT(token);
 
-  const signedContent = new TextEncoder().encode(token.split('.').slice(0, 2).join('.'));
-
-  const decodedSignature = new Uint8Array(Array.from(signature).map(c => c.charCodeAt(0)));
-
-  const isVerified = await crypto.subtle.verify(
-      {
-        name: "RSASSA-PKCS1-v1_5",
-        hash: { name: "SHA-256" },
-      },
-      publicKey,
-      decodedSignature,
-      signedContent
+  const signedContent = new TextEncoder().encode(
+    token.split(".").slice(0, 2).join("."),
   );
 
-  //check exp, iat, nbf here. 
+  const decodedSignature = new Uint8Array(
+    Array.from(signature).map((c) => c.charCodeAt(0)),
+  );
+
+  const isVerified = await crypto.subtle.verify(
+    {
+      name: "RSASSA-PKCS1-v1_5",
+      hash: { name: "SHA-256" },
+    },
+    publicKey,
+    decodedSignature,
+    signedContent,
+  );
+
+  //check exp, iat, nbf here.
   //exp should be greater than Date.now()
   //iat should be less than Date.now()
   //nbf should be less than Date.now()
