@@ -1,7 +1,8 @@
 ﻿import { Context } from "https://deno.land/x/oak@v13.0.0/mod.ts";
+import "../../extensions/oakExtensions.ts";
 
-const JWKS_URL = "https://dev-....us.auth0.com/.well-known/jwks.json";
-const ISSUER = "https://dev-....us.auth0.com/";
+const JWKS_URL = "https://dev-.36iiyjowe0hqm1m6.us.auth0.com/.well-known/jwks.json";
+const ISSUER = "https://dev-.36iiyjowe0hqm1m6.us.auth0.com/";
 const AUDIENCE = "https://localhost:7027";
 
 let cachedPublicKey: CryptoKey | null = null;
@@ -23,8 +24,7 @@ async function authMiddleware(ctx: Context, next: () => Promise<unknown>) {
 
     await next();
   } catch (error) {
-    ctx.response.status = 401;
-    ctx.response.body = { message: "Get out of here", error: error.message };
+    ctx.toJsonResponse(401, { message: "Get out of here, please", error: error.message });
   }
 }
 
