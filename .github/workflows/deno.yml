@@ -13,15 +13,6 @@ jobs:
       - name: Setup repo
         uses: actions/checkout@v4
 
-      - name: Cache Deno modules
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.deno
-          key: ${{ runner.os }}-deno-${{ hashFiles('src/main.ts') }}
-          restore-keys: |
-            ${{ runner.os }}-deno-
-
       - name: Setup Deno
         uses: denoland/setup-deno@61fe2df320078202e33d7d5ad347e7dcfa0e8f31
         with:
